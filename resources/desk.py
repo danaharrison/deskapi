@@ -10,8 +10,8 @@ def getHeight():
         #Read value from height sensor here using RPi.GPIO
         return height
 class Desk(Resource):
-        def get(self):                
-                return f"Height is {getHeight()}", 200   
+        def get(self):
+                return f"Height is {getHeight()}", 200
 
         def post(self, direction):
                 global height
@@ -22,7 +22,7 @@ class Desk(Resource):
                 GPIO.setmode(GPIO.BCM)
                 gpioPin = -1
 		gpioState = GPIO.LOW
-                #if args['pin'] == 0 or args['pin'] == 1 and args['state'] == 0 or args['state'] == 1:
+		#if args['pin'] == 0 or args['pin'] == 1 and args['state'] == 0 or args['state'] == 1:
 		if args['pin'] == 0:
 			gpioPin = 17
 		elif args['pin'] == 1:
@@ -37,14 +37,14 @@ class Desk(Resource):
                         print(f"GPIO state is {GPIO.input(gpioPin)")
 
                 if direction.lower() == 'up':
-                        while height <= 100: 
-                                #Standing height here                        
+                        while height <= 100:
+                                #Standing height here
                                 height += 50
                                 #Fire relay up here
                         return f"Moved desk {direction} to {height}.", 200
-                elif direction.lower() == 'down':       
+                elif direction.lower() == 'down':
                         while height >= 50:
-                                #Sitting height here                 
+                                #Sitting height here
                                 height -= 50
                                 #Fire relay down here
                         return f"Moved desk {direction} to {height}.", 200
