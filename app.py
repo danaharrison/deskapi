@@ -8,8 +8,6 @@ import random
 app = Flask(__name__)
 api = Api(app)
 
-
-
 api.add_resource(Quote, "/ai-quotes", "/ai-quotes/", "/ai-quotes/<int:id>")
 api.add_resource(Desk, "/desk", "/desk/", "/desk/<string:direction>")
 
