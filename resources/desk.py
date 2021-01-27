@@ -1,5 +1,7 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
+import RPi.GPIO as GPIO
+import time
 
 height = 0
 
@@ -13,6 +15,17 @@ class Desk(Resource):
 
         def post(self, direction):
                 global height
+                parser = reqparse.RequestParser()
+                parser.add_argument('pin', type=int, required=False)
+                parser.add_argument('state', type=int, required=False)
+                args = parser.parse_args()
+                if args['pin'] == 0 or args['pin'] == 1:
+                        GPIO.setmode(GPIO.BCM)
+                        GPIO.setup(18, GPIO.OUT)
+                        GPIO.output(18, GPIO.HIGH)
+                        time.sleep(5)
+                        GPIO.output(18, GPIO.LOW)
+                print(args)
                 if direction.lower() == 'up':
                         while height <= 100: 
                                 #Standing height here                        
