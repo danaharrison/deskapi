@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import time
 
 height = 0
@@ -19,22 +19,23 @@ class Desk(Resource):
                 parser.add_argument('pin', type=int, required=False)
                 parser.add_argument('state', type=int, required=False)
                 args = parser.parse_args()
-                GPIO.setmode(GPIO.BCM)
+                #GPIO.setmode(GPIO.BCM)
                 gpioPin = -1
-		gpioState = GPIO.LOW
+        	#gpioState = GPIO.LOW
 		#if args['pin'] == 0 or args['pin'] == 1 and args['state'] == 0 or args['state'] == 1:
-		if args['pin'] == 0:
-			gpioPin = 17
-		elif args['pin'] == 1:
-			gpioPin = 18
+                if args['pin'] == 0:
+                        gpioPin = 17
+                elif args['pin'] == 1:
+                        gpioPin = 18
 
-		if args['state'] == 0:
-			gpioState = GPIO.HIGH
-
-		if gpioPin != -1:
-			GPIO.setup(gpioPin, GPIO.OUT)
-	                GPIO.output(gpioPin, gpioState)
-                        print(f"GPIO state is {GPIO.input(gpioPin)")
+                if args['state'] == 0:
+			#gpioState = GPIO.HIGH
+                        print("Hello")
+                if gpioPin != -1:
+			#GPIO.setup(gpioPin, GPIO.OUT)
+	                #GPIO.output(gpioPin, gpioState)
+                        #print(f"GPIO state is {GPIO.input(gpioPin)")
+                        print("Hello")
 
                 if direction.lower() == 'up':
                         while height <= 100:
