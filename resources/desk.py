@@ -19,8 +19,8 @@ class Desk(Resource):
                 parser.add_argument('pin', type=int, required=False)
                 parser.add_argument('state', type=int, required=False)
                 args = parser.parse_args()
-		GPIO.setmode(GPIO.BCM)
-		gpioPin = -1
+                GPIO.setmode(GPIO.BCM)
+                gpioPin = -1
 		gpioState = GPIO.LOW
                 #if args['pin'] == 0 or args['pin'] == 1 and args['state'] == 0 or args['state'] == 1:
 		if args['pin'] == 0:
@@ -34,8 +34,8 @@ class Desk(Resource):
 		if gpioPin != -1:
 			GPIO.setup(gpioPin, GPIO.OUT)
 	                GPIO.output(gpioPin, gpioState)
+                        print(f"GPIO state is {GPIO.input(gpioPin)")
 
-                print(args)
                 if direction.lower() == 'up':
                         while height <= 100: 
                                 #Standing height here                        
