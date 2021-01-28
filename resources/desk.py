@@ -15,13 +15,13 @@ def getHeight():
 
 def moveDesk(direction):
     gpioPin = -1
-        
+
     if direction == 'up':
         gpioPin = 17
     elif direction == 'down':
         gpioPin = 18
 
-    GPIO.setmode(GPIO.BCM)        
+    GPIO.setmode(GPIO.BCM)
     #gpioState = GPIO.HIGH
 
     GPIO.setup(gpioPin, GPIO.OUT)
@@ -46,7 +46,7 @@ class Desk(Resource):
 
         move_desk = Process(
             target = moveDesk,
-            args = (direction),
+            args = (direction,),
             daemon = True
         )
         move_desk.start()
