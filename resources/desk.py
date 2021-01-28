@@ -34,13 +34,14 @@ class Desk(Resource):
             gpioPin = 18
 
         GPIO.setmode(GPIO.BCM)        
-        gpioState = GPIO.LOW
+        gpioState = GPIO.HIGH
 
         GPIO.setup(gpioPin, GPIO.OUT)
-        GPIO.output(gpioPin, GPIO.HIGH)
-        time.sleep(5)
         GPIO.output(gpioPin, GPIO.LOW)
+        time.sleep(5)
+        GPIO.output(gpioPin, GPIO.HIGH)
 
+        return f"Desk went {args['direction']}", 200
         
         if args['pin'] == 0 or args['pin'] == 1 and args['state'] == 0 or args['state'] == 1:
             # if args['pin'] == 0:
