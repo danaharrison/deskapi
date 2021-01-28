@@ -14,7 +14,22 @@ def getHeight():
     return height
 
 def moveDesk(direction):
-    print f"Moved desk {direction}"
+    gpioPin = -1
+        
+    if direction == 'up':
+        gpioPin = 17
+    elif direction == 'down':
+        gpioPin = 18
+
+    GPIO.setmode(GPIO.BCM)        
+    #gpioState = GPIO.HIGH
+
+    GPIO.setup(gpioPin, GPIO.OUT)
+    GPIO.output(gpioPin, GPIO.LOW)
+    time.sleep(5)
+    GPIO.output(gpioPin, GPIO.HIGH)
+
+    print(f"Moved desk {direction}")
 
 class Desk(Resource):
     def get(self):
@@ -27,23 +42,16 @@ class Desk(Resource):
         parser.add_argument('direction', type=str, required=False)
         #parser.add_argument('state', type=int, required=False)
         args = parser.parse_args()
+        direction = args['direction']
 
-        gpioPin = -1
-        
-        if args['direction'] == 'up':
-            gpioPin = 17
-        elif args['direction'] == 'down':
-            gpioPin = 18
+        move_desk = Process(
+            target = moveDesk,
+            args = (direction),
+            daemon = True
+        )
+        move_desk.start()
 
-        GPIO.setmode(GPIO.BCM)        
-        gpioState = GPIO.HIGH
-
-        GPIO.setup(gpioPin, GPIO.OUT)
-        GPIO.output(gpioPin, GPIO.LOW)
-        time.sleep(5)
-        GPIO.output(gpioPin, GPIO.HIGH)
-
-        return f"Desk went {args['direction']}", 200
+        return f"Preparing to move desk in direction: {args['direction']}", 202
         
         if args['pin'] == 0 or args['pin'] == 1 and args['state'] == 0 or args['state'] == 1:
             # if args['pin'] == 0:
