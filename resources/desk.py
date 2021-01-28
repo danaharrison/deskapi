@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
+from multiprocessing import Process
 import RPi.GPIO as GPIO
 import time
 
@@ -7,12 +8,13 @@ height = 50
 maxHeight = 200
 minHeight = 50
 
-
 def getHeight():
     global height
     # Read value from height sensor here using RPi.GPIO
     return height
 
+def moveDesk(direction):
+    print f"Moved desk {direction}"
 
 class Desk(Resource):
     def get(self):
