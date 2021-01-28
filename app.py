@@ -2,6 +2,7 @@ from flask import Flask
 from flask_restful import Api, Resource, reqparse
 from resources.desk import Desk
 from resources.quotes import Quote
+from resources.light import Light
 #import RPi.GPIO as GPIO
 import random
 
@@ -10,6 +11,7 @@ api = Api(app)
 
 api.add_resource(Quote, "/ai-quotes", "/ai-quotes/", "/ai-quotes/<int:id>")
 api.add_resource(Desk, "/desk", "/desk/", "/desk/<string:direction>")
+api.add_resource(Light, "/light", "/light/", "/light/<string:colour>")
 
 if __name__ == '__main__':
 	#app.run(debug=True)
