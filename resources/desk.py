@@ -20,13 +20,16 @@ class Desk(Resource):
 
     def post(self, direction):
         global height
+
         parser = reqparse.RequestParser()
         parser.add_argument('pin', type=int, required=False)
         parser.add_argument('state', type=int, required=False)
         args = parser.parse_args()
+        
         GPIO.setmode(GPIO.BCM)
         gpioPin = -1
         gpioState = GPIO.LOW
+        
         if args['pin'] == 0 or args['pin'] == 1 and args['state'] == 0 or args['state'] == 1:
             if args['pin'] == 0:
                 gpioPin = 17
@@ -35,7 +38,7 @@ class Desk(Resource):
 
             if args['state'] == 1:
                 gpioState = GPIO.HIGH
-                print("Hello")
+
             if gpioPin != -1:
                 GPIO.setup(gpioPin, GPIO.OUT)
                 GPIO.output(gpioPin, gpioState)
