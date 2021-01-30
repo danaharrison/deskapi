@@ -4,14 +4,43 @@ from multiprocessing import Process
 import RPi.GPIO as GPIO
 import time
 
-height = 50
 maxHeight = 200
 minHeight = 50
 
 def getHeight():
-    global height
-    # Read value from height sensor here using RPi.GPIO
-    return height
+    
+    try:
+	    GPIO.setmode(GPIO.BOARD)
+	    PIN_TRIGGER = 29
+	    PIN_ECHO = 31
+
+	    GPIO.setup(PIN_TRIGGER, GPIO.OUT)
+	    GPIO.setup(PIN_ECHO, GPIO.IN)
+
+	    GPIO.output(PIN_TRIGGER, GPIO.LOW)
+	    print("Waiting for sensor to settle")
+	    time.sleep(0.05)
+
+	    print("Calculating distance...")
+	    GPIO.output(PIN_TRIGGER, GPIO.HIGH)
+	    time.sleep(0.00001)
+	    GPIO.output(PIN_TRIGGER, GPIO.LOW)
+
+	    while GPIO.input(PIN_ECHO) == 0:
+		    pulse_start_time = time.time()
+	    while GPIO.input(PIN_ECHO) == 1:
+		    pulse_end_time = time.time()
+
+	    pulse_duration = pulse_end_time - pulse_start_time
+
+	    distance = round(pulse_duration * 17150, 2)
+
+	    print(f"Distance: {distance} cm")        
+    
+    finally:
+	    GPIO.cleanup()
+    
+    return distance
 
 def moveDesk(direction):
     gpioPin = -1
@@ -24,10 +53,18 @@ def moveDesk(direction):
     GPIO.setmode(GPIO.BCM)
     #gpioState = GPIO.HIGH
 
-    GPIO.setup(gpioPin, GPIO.OUT)
-    GPIO.output(gpioPin, GPIO.LOW)
-    time.sleep(5)
-    GPIO.output(gpioPin, GPIO.HIGH)
+    if direction == 'up':
+        upHeight = getHeight()
+        GPIO.output(gpioPin, GPIO.LOW)
+        while upHeight < maxHeight - 2:
+            upHeight = getHeight()
+        GPIO.output(gpioPin, GPIO.HIGH)
+    elif direction == 'down':
+        downHeight = getHeight()
+        GPIO.output(gpioPin, GPIO.LOW)
+        while downHeight > minHeight + 2:
+            downHeight = getHeight()
+        GPIO.output(gpioPin, GPIO.HIGH)
 
     print(f"Moved desk {direction}")
 
@@ -36,8 +73,6 @@ class Desk(Resource):
         return f"Height is {getHeight()}", 200
 
     def post(self):
-        global height
-
         parser = reqparse.RequestParser()
         parser.add_argument('direction', type=str, required=False)
         #parser.add_argument('state', type=int, required=False)
@@ -53,40 +88,3 @@ class Desk(Resource):
 
         return f"Preparing to move desk in direction: {args['direction']}", 202
         
-        if args['pin'] == 0 or args['pin'] == 1 and args['state'] == 0 or args['state'] == 1:
-            # if args['pin'] == 0:
-            #     gpioPin = 17
-            # elif args['pin'] == 1:
-            #     gpioPin = 18
-
-            # if args['state'] == 1:
-            #     gpioState = GPIO.HIGH
-
-            # if gpioPin != -1:
-            #     GPIO.setup(gpioPin, GPIO.OUT)
-            #     GPIO.output(gpioPin, gpioState)
-            #     print(f"GPIO state is {GPIO.input(gpioPin)}")
-
-            # if direction.lower() == 'up':
-            #     if height >= maxHeight:
-            #         return "Already at max height.", 500
-            #     else:
-            #         while height < maxHeight:
-            #             # Standing height here
-            #             height += 1
-            #             # Fire relay up here
-            #         return f"Moved desk {direction} to {height}.", 200
-            # elif direction.lower() == 'down':
-            #     if height <= minHeight:
-            #         return "Already at min height.", 500
-            #     else:
-            #         while height > minHeight:
-            #             # Sitting height here
-            #             height -= 1
-            #             # Fire relay down here
-            #         return f"Moved desk {direction} to {height}.", 200
-            # else:
-            #     return f"{direction} is not a valid direction.", 500
-            return "Hello", 200
-        else:
-            return "Invalid pin or state value.", 500
