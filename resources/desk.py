@@ -12,10 +12,14 @@ import adafruit_ssd1306
 maxHeight = 125
 minHeight = 50
 
+i2c = busio.I2C(SCL, SDA)
+disp = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c)
+
+
 def getHeight():
 
     try:
-        #GPIO.cleanup()
+        # GPIO.cleanup()
         GPIO.setmode(GPIO.BCM)
         PIN_TRIGGER = 5
         PIN_ECHO = 6
@@ -24,10 +28,10 @@ def getHeight():
         GPIO.setup(PIN_ECHO, GPIO.IN)
 
         GPIO.output(PIN_TRIGGER, GPIO.LOW)
-        print("Waiting for sensor to settle")
-        time.sleep(0.05)
+        #print("Waiting for sensor to settle")
+        time.sleep(0.2)
 
-        print("Calculating distance...")
+        #print("Calculating distance...")
         GPIO.output(PIN_TRIGGER, GPIO.HIGH)
         time.sleep(0.00001)
         GPIO.output(PIN_TRIGGER, GPIO.LOW)
@@ -41,27 +45,18 @@ def getHeight():
 
         distance = round(pulse_duration * 17150, 2)
 
-        print(f"Distance: {distance} cm")
+        #print(f"Distance: {distance} cm")
         showHeight(distance)
 
     finally:
-        #GPIO.cleanup()
+        # GPIO.cleanup()
         return distance
 
+
 def showHeight(heightValue):
-    # Create the I2C interface.
-    i2c = busio.I2C(SCL, SDA)
+    #print(f"Entered the showHeight method, height is {heightValue} cm")
 
-    # Create the SSD1306 OLED class.
-    # The first two parameters are the pixel width and pixel height.  Change these
-    # to the right size for your display!
-    disp = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c)
-
-    # Clear display.
-    disp.fill(0)
-    disp.show()
-
-    # Create blank image for drawing.
+    # Create blank image for drawing
     # Make sure to create image with mode '1' for 1-bit color.
     width = disp.width
     height = disp.height
@@ -70,23 +65,22 @@ def showHeight(heightValue):
     # Get drawing object to draw on image.
     draw = ImageDraw.Draw(image)
 
-    # Draw a black filled box to clear the image.
-    draw.rectangle((0, 0, width, height), outline=0, fill=0)
-
     # Draw some shapes.
     # First define some constants to allow easy resizing of shapes.
     padding = -2
     top = padding
     bottom = height - padding
-    # Move left to right keeping track of the current x position for drawing shapes.
+    # Move left to right keeping track of the current x position for drawing
+    # shapes.
     x = 0
 
-    font = ImageFont.truetype('VCR_OSD_MONO_1.001.ttf', 30)
+    font = ImageFont.truetype('resources/VCR_OSD_MONO_1.001.ttf', 24)
 
-    draw.text((x, top + 0), f"{heightValue} cm", font=font, fill=255, align="center")
+    draw.text((x, top + 0), f"{'{0:.2f}'.format(heightValue)} cm", font=font, fill=255)
 
     disp.image(image)
     disp.show()
+
 
 def moveDesk(direction):
     gpioPin = -1
@@ -115,10 +109,24 @@ def moveDesk(direction):
 
     print(f"Moved desk {direction}")
     GPIO.cleanup()
+    time.sleep(5)
+    disp.fill(0)
+    disp.show()
+
+
+def clearDisplay():
+    time.sleep(5)
+    disp.fill(0)
+    disp.show()
 
 
 class Desk(Resource):
     def get(self):
+        clearDisp = Process(
+            target=clearDisplay,
+            daemon=True
+        )
+        clearDisp.start()
         return f"Height is {getHeight()}", 200
 
     def post(self):
