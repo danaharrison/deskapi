@@ -4,7 +4,7 @@ from multiprocessing import Process
 import RPi.GPIO as GPIO
 import time
 
-maxHeight = 200
+maxHeight = 125
 minHeight = 50
 
 
