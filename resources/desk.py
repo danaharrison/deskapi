@@ -7,7 +7,6 @@ import time
 maxHeight = 125
 minHeight = 50
 
-
 def getHeight():
 
     try:
@@ -42,6 +41,8 @@ def getHeight():
     finally:
         #GPIO.cleanup()
         return distance
+
+def showHeight(heightValue)
 
 def moveDesk(direction):
     gpioPin = -1
