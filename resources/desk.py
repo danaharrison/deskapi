@@ -11,10 +11,10 @@ minHeight = 50
 def getHeight():
 
     try:
-        GPIO.cleanup()
-        GPIO.setmode(GPIO.BOARD)
-        PIN_TRIGGER = 29
-        PIN_ECHO = 31
+        #GPIO.cleanup()
+        GPIO.setmode(GPIO.BCM)
+        PIN_TRIGGER = 5
+        PIN_ECHO = 6
 
         GPIO.setup(PIN_TRIGGER, GPIO.OUT)
         GPIO.setup(PIN_ECHO, GPIO.IN)
@@ -40,10 +40,8 @@ def getHeight():
         print(f"Distance: {distance} cm")
 
     finally:
-        GPIO.cleanup()
-
-    return distance
-
+        #GPIO.cleanup()
+        return distance
 
 def moveDesk(direction):
     gpioPin = -1
@@ -54,6 +52,7 @@ def moveDesk(direction):
         gpioPin = 18
 
     GPIO.setmode(GPIO.BCM)
+    GPIO.setup(gpioPin, GPIO.OUT)
     #gpioState = GPIO.HIGH
 
     if direction == 'up':
@@ -70,6 +69,7 @@ def moveDesk(direction):
         GPIO.output(gpioPin, GPIO.HIGH)
 
     print(f"Moved desk {direction}")
+    GPIO.cleanup()
 
 
 class Desk(Resource):
