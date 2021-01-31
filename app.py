@@ -1,9 +1,7 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
 from resources.desk import Desk
-from resources.quotes import Quote
 from resources.light import Light
-#import RPi.GPIO as GPIO
 import random
 
 app = Flask(__name__)

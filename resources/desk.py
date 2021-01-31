@@ -7,40 +7,43 @@ import time
 maxHeight = 200
 minHeight = 50
 
+
 def getHeight():
-    
+
     try:
-	    GPIO.setmode(GPIO.BOARD)
-	    PIN_TRIGGER = 29
-	    PIN_ECHO = 31
+        GPIO.cleanup()
+        GPIO.setmode(GPIO.BOARD)
+        PIN_TRIGGER = 29
+        PIN_ECHO = 31
 
-	    GPIO.setup(PIN_TRIGGER, GPIO.OUT)
-	    GPIO.setup(PIN_ECHO, GPIO.IN)
+        GPIO.setup(PIN_TRIGGER, GPIO.OUT)
+        GPIO.setup(PIN_ECHO, GPIO.IN)
 
-	    GPIO.output(PIN_TRIGGER, GPIO.LOW)
-	    print("Waiting for sensor to settle")
-	    time.sleep(0.05)
+        GPIO.output(PIN_TRIGGER, GPIO.LOW)
+        print("Waiting for sensor to settle")
+        time.sleep(0.05)
 
-	    print("Calculating distance...")
-	    GPIO.output(PIN_TRIGGER, GPIO.HIGH)
-	    time.sleep(0.00001)
-	    GPIO.output(PIN_TRIGGER, GPIO.LOW)
+        print("Calculating distance...")
+        GPIO.output(PIN_TRIGGER, GPIO.HIGH)
+        time.sleep(0.00001)
+        GPIO.output(PIN_TRIGGER, GPIO.LOW)
 
-	    while GPIO.input(PIN_ECHO) == 0:
-		    pulse_start_time = time.time()
-	    while GPIO.input(PIN_ECHO) == 1:
-		    pulse_end_time = time.time()
+        while GPIO.input(PIN_ECHO) == 0:
+            pulse_start_time = time.time()
+        while GPIO.input(PIN_ECHO) == 1:
+            pulse_end_time = time.time()
 
-	    pulse_duration = pulse_end_time - pulse_start_time
+        pulse_duration = pulse_end_time - pulse_start_time
 
-	    distance = round(pulse_duration * 17150, 2)
+        distance = round(pulse_duration * 17150, 2)
 
-	    print(f"Distance: {distance} cm")        
-    
+        print(f"Distance: {distance} cm")
+
     finally:
-	    GPIO.cleanup()
-    
+        GPIO.cleanup()
+
     return distance
+
 
 def moveDesk(direction):
     gpioPin = -1
@@ -68,6 +71,7 @@ def moveDesk(direction):
 
     print(f"Moved desk {direction}")
 
+
 class Desk(Resource):
     def get(self):
         return f"Height is {getHeight()}", 200
@@ -80,11 +84,10 @@ class Desk(Resource):
         direction = args['direction']
 
         move_desk = Process(
-            target = moveDesk,
-            args = (direction,),
-            daemon = True
+            target=moveDesk,
+            args=(direction,),
+            daemon=True
         )
         move_desk.start()
 
         return f"Preparing to move desk in direction: {args['direction']}", 202
-        
