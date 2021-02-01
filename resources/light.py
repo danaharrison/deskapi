@@ -38,7 +38,10 @@ class Light(Resource):
             if colour == 'off' or brightness == 0.00:
                 pixels.deinit()
             else:
-                pixels.fill(webcolors.name_to_rgb(colour))   
+                pixels.fill(webcolors.name_to_rgb(colour))
+    
+    def getColour():
+        print("LOL")
 
     def post(self):
         #Pull in colour and/or brightness from query parameters
