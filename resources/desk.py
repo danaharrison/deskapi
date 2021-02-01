@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
 from multiprocessing import Process
+from resources.light import Light
 import RPi.GPIO as GPIO
 import time
 import subprocess
@@ -99,13 +100,17 @@ def moveDesk(direction):
         GPIO.output(gpioPin, GPIO.LOW)
         while upHeight < maxHeight - 2:
             upHeight = getHeight()
+            Light.changeLight('rainbow', 1.00)
         GPIO.output(gpioPin, GPIO.HIGH)
+        Light.changeLight('white', 0.50)
     elif direction == 'down':
         downHeight = getHeight()
         GPIO.output(gpioPin, GPIO.LOW)
         while downHeight > minHeight + 2:
             downHeight = getHeight()
+            Light.changeLight('rainbow', 1.00)
         GPIO.output(gpioPin, GPIO.HIGH)
+        Light.changeLight('white', 0.50)
 
     print(f"Moved desk {direction}")
     GPIO.cleanup()

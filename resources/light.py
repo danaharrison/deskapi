@@ -5,34 +5,68 @@ import neopixel
 import time
 import webcolors
 
-class Light(Resource):
+def wheel(pos):
+        # Input a value 0 to 255 to get a color value.
+        # The colours are a transition r - g - b - back to r.
+        if pos < 0 or pos > 255:
+            return (0, 0, 0)
+        if pos < 85:
+            return (255 - pos * 3, pos * 3, 0)
+        if pos < 170:
+            pos -= 85
+            return (0, 255 - pos * 3, pos * 3)
+        pos -= 170
+        return (pos * 3, 0, 255 - pos * 3)
+
+def rainbow_cycle(wait, pixels, num_pixels):
+    for j in range(255):
+        for i in range(num_pixels):
+            rc_index = (i * 256 // num_pixels) + j
+            pixels[i] = wheel(rc_index & 255)
+        pixels.show()
+        time.sleep(wait)
+
+class Light(Resource):   
+
+    def changeLight(colour, brightness):
+        stripLength = 60
+        pixels = neopixel.NeoPixel(board.D21, stripLength, brightness=brightness)
+        
+        if colour == 'rainbow':
+            rainbow_cycle(1, pixels, stripLength)
+        elif colour is not None and brightness is not None:
+            if colour == 'off' or brightness == 0.00:
+                pixels.deinit()
+            else:
+                pixels.fill(webcolors.name_to_rgb(colour))   
+
     def post(self):
+        #Pull in colour and/or brightness from query parameters
         parser = reqparse.RequestParser()
         parser.add_argument('colour', type=str, required=False)
         parser.add_argument('brightness', type=str, required=False)
         args = parser.parse_args()
-        brightness = 0.5
 
+        #Set default values if none provided
+        brightness = 0.5
+        colour = 'white'
+
+        #If neither are provided, return 400
         if args['brightness'] is None and args['colour'] is None:
             return f"Please specify either a brightness or colour.", 400
 
-        colour = args['colour']
+        if args['colour'] is not None:
+            colour = args['colour']
+        
         if args['brightness'] is not None:
             try:
-                brightnessArg = float(args['brightness'])
-                if 0.10 <= brightnessArg <= 1.00:
-                    brightness = brightnessArg
+                brightness = float(args['brightness'])
+                if brightness < 0.00 or brightness > 1.00:
+                    brightness = 0.5
             except:
-                return f"Brightness value {args['brightness']} not allowed; provide a value from 0.10 to 1.00", 400
+                #Brightness of 0 will turn the strip off, as will colour 'off'
+                return f"Brightness value {args['brightness']} not allowed; provide a value from 0.00 to 1.00", 400
 
-        pixels = neopixel.NeoPixel(board.D21, 60, brightness=brightness)
-
-        if colour is not None:
-            if colour == 'off':
-                pixels.deinit()
-            else:
-                pixels.fill(webcolors.name_to_rgb(colour))
-        else:
-            return "No colour specified.", 400
+        Light.changeLight(colour, brightness)       
         
-        return "Good stuff.", 200
+        return f"Colour: {colour} | Brightness: {brightness}", 200
