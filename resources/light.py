@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
+from flask_caching import Cache
 import board
 import neopixel
 import time
@@ -26,22 +27,34 @@ def rainbow_cycle(wait, pixels, num_pixels):
         pixels.show()
         time.sleep(wait)
 
-class Light(Resource):   
+stripLength = 60
+
+class Light(Resource):
+
+    cache = Cache()
 
     def changeLight(colour, brightness):
-        stripLength = 60
+        global stripLength
         pixels = neopixel.NeoPixel(board.D21, stripLength, brightness=brightness)
-        
+
         if colour == 'rainbow':
             rainbow_cycle(1, pixels, stripLength)
+            Light.cache.set('colour', 'rainbow')
         elif colour is not None and brightness is not None:
             if colour == 'off' or brightness == 0.00:
                 pixels.deinit()
+                Light.cache.set('colour', 'off')
             else:
-                pixels.fill(webcolors.name_to_rgb(colour))
-    
+                if type(colour) is not webcolors.IntegerRGB:
+                    colourName = webcolors.name_to_rgb(colour)
+                    pixels.fill(colourName)
+                    Light.cache.set('colour',colourName)
+                else:
+                    pixels.fill(colour)
+                    Light.cache.set('colour',webcolors.rgb_to_name(colour))
+
     def getColour():
-        print("LOL")
+        return Light.cache.get('colour')
 
     def post(self):
         #Pull in colour and/or brightness from query parameters
