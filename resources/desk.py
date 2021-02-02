@@ -2,6 +2,7 @@ from flask import Flask
 from flask_restful import Api, Resource, reqparse
 from multiprocessing import Process
 from resources.light import Light
+import ..config as config
 import RPi.GPIO as GPIO
 import time
 import subprocess
@@ -10,8 +11,8 @@ import busio
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
 
-maxHeight = 125
-minHeight = 50
+maxHeight = config.desk['maxHeight']
+minHeight = config.desk['minHeight']
 
 i2c = busio.I2C(SCL, SDA)
 disp = adafruit_ssd1306.SSD1306_I2C(128, 32, i2c)
@@ -22,8 +23,8 @@ def getHeight():
     try:
         # GPIO.cleanup()
         GPIO.setmode(GPIO.BCM)
-        PIN_TRIGGER = 5
-        PIN_ECHO = 6
+        PIN_TRIGGER = config.pins['trigger']
+        PIN_ECHO = config.pins['echo']
 
         GPIO.setup(PIN_TRIGGER, GPIO.OUT)
         GPIO.setup(PIN_ECHO, GPIO.IN)
@@ -66,7 +67,7 @@ def showHeight(heightValue):
     # Get drawing object to draw on image.
     draw = ImageDraw.Draw(image)
 
-    # Draw some shapes.
+    # Draw some shapes
     # First define some constants to allow easy resizing of shapes.
     padding = -2
     top = padding
@@ -87,9 +88,9 @@ def moveDesk(direction):
     gpioPin = -1
 
     if direction == 'up':
-        gpioPin = 17
+        gpioPin = config.pins['relayUp']
     elif direction == 'down':
-        gpioPin = 18
+        gpioPin = config.pins['relayDown']
 
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(gpioPin, GPIO.OUT)

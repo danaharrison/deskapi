@@ -1,12 +1,13 @@
 from flask import Flask
 from flask_restful import Api, Resource, reqparse
 from flask_caching import Cache
+import ..config as config
 import board
 import neopixel
 import time
 import webcolors
 
-stripLength = 60
+stripLength = config.leds['length']
 
 class LightStats():
     def __init__(self, colour, brightness):
