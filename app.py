@@ -4,11 +4,12 @@ from flask_restful import Api, Resource, reqparse
 from resources.desk import Desk
 from resources.light import Light
 import random
+import config as config
 
 app = Flask(__name__)
 api = Api(app)
 Light.cache.init_app(app, config={'CACHE_TYPE': 'simple'})
-Light.changeLight('white', 0.5)
+Light.changeLight(config.leds['defaultColour'], config.leds['defaultBrightness'])
 
 api.add_resource(Desk, "/desk", "/desk/", "/desk/<string:direction>")
 api.add_resource(Light, "/light", "/light/", "/light/<string:colour>")

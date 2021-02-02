@@ -6,7 +6,9 @@ pins = {
 }
 
 leds = {
-    "length": 60
+    "length": 60,
+    "defaultColour": "white",
+    "defaultBrightness": 0.5
 }
 
 desk = {
