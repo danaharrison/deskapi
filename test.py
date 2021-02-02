@@ -1,3 +1,3 @@
 from resources.light import Light
 
-Light.change
+Light.changeLight('off', 0)

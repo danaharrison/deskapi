@@ -98,23 +98,23 @@ def moveDesk(direction):
     if direction == 'up':
         upHeight = getHeight()
         GPIO.output(gpioPin, GPIO.LOW)
-        colour = Light.getColour()
+        currentLight = Light.getLight()
         Light.changeLight('green', 1.00)
         while upHeight < maxHeight - 2:
             upHeight = getHeight()
         GPIO.output(gpioPin, GPIO.HIGH)
-        print(f"Colour is {colour}")
-        Light.changeLight(colour, 0.50)
+        #print(f"Colour is {colour}")
+        Light.changeLight(currentLight.colour, currentLight.brightness)
     elif direction == 'down':
         downHeight = getHeight()
         GPIO.output(gpioPin, GPIO.LOW)
-        colour = Light.getColour()
+        currentLight = Light.getLight()
         Light.changeLight('red', 1.00)
         while downHeight > minHeight + 2:
             downHeight = getHeight()
         GPIO.output(gpioPin, GPIO.HIGH)
-        print(f"Colour is {colour}")
-        Light.changeLight(colour, 0.50)
+        #print(f"Colour is {colour}")
+        Light.changeLight(currentLight.colour, currentLight.brightness)
 
     print(f"Moved desk {direction}")
     GPIO.cleanup()

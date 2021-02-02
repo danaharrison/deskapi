@@ -25,9 +25,14 @@ def rainbow_cycle(wait, pixels, num_pixels):
             rc_index = (i * 256 // num_pixels) + j
             pixels[i] = wheel(rc_index & 255)
         pixels.show()
-        time.sleep(wait)
+        #time.sleep(wait)
 
 stripLength = 60
+
+class LightStats():
+    def __init__(self, colour, brightness):
+        self.colour = colour
+        self.brightness = brightness
 
 class Light(Resource):
 
@@ -39,22 +44,22 @@ class Light(Resource):
 
         if colour == 'rainbow':
             rainbow_cycle(1, pixels, stripLength)
-            Light.cache.set('colour', 'rainbow')
+            Light.cache.set('ledstrip', LightStats(colour, brightness))
         elif colour is not None and brightness is not None:
             if colour == 'off' or brightness == 0.00:
                 pixels.deinit()
-                Light.cache.set('colour', 'off')
+                Light.cache.set('ledstrip', LightStats('off', 0.00))
             else:
                 if type(colour) is not webcolors.IntegerRGB:
                     colourName = webcolors.name_to_rgb(colour)
                     pixels.fill(colourName)
-                    Light.cache.set('colour',colourName)
+                    Light.cache.set('ledstrip', LightStats(colourName, brightness))
                 else:
                     pixels.fill(colour)
-                    Light.cache.set('colour',webcolors.rgb_to_name(colour))
+                    Light.cache.set('ledstrip', LightStats(webcolors.rgb_to_name(colour), brightness))
 
-    def getColour():
-        return Light.cache.get('colour')
+    def getLight():        
+        return Light.cache.get('ledstrip')
 
     def post(self):
         #Pull in colour and/or brightness from query parameters
