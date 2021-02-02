@@ -2,7 +2,7 @@ from flask import Flask
 from flask_restful import Api, Resource, reqparse
 from multiprocessing import Process
 from resources.light import Light
-import ..config as config
+import config as config
 import RPi.GPIO as GPIO
 import time
 import subprocess
