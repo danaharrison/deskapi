@@ -6,27 +6,6 @@ import neopixel
 import time
 import webcolors
 
-def wheel(pos):
-        # Input a value 0 to 255 to get a color value.
-        # The colours are a transition r - g - b - back to r.
-        if pos < 0 or pos > 255:
-            return (0, 0, 0)
-        if pos < 85:
-            return (255 - pos * 3, pos * 3, 0)
-        if pos < 170:
-            pos -= 85
-            return (0, 255 - pos * 3, pos * 3)
-        pos -= 170
-        return (pos * 3, 0, 255 - pos * 3)
-
-def rainbow_cycle(wait, pixels, num_pixels):
-    for j in range(255):
-        for i in range(num_pixels):
-            rc_index = (i * 256 // num_pixels) + j
-            pixels[i] = wheel(rc_index & 255)
-        pixels.show()
-        #time.sleep(wait)
-
 stripLength = 60
 
 class LightStats():
@@ -43,8 +22,7 @@ class Light(Resource):
         pixels = neopixel.NeoPixel(board.D21, stripLength, brightness=brightness)
 
         if colour == 'rainbow':
-            rainbow_cycle(1, pixels, stripLength)
-            Light.cache.set('ledstrip', LightStats(colour, brightness))
+            print("Nope, you disabled that.")
         elif colour is not None and brightness is not None:
             if colour == 'off' or brightness == 0.00:
                 pixels.deinit()
@@ -58,7 +36,7 @@ class Light(Resource):
                     pixels.fill(colour)
                     Light.cache.set('ledstrip', LightStats(webcolors.rgb_to_name(colour), brightness))
 
-    def getLight():        
+    def getLight():
         return Light.cache.get('ledstrip')
 
     def post(self):
@@ -78,7 +56,7 @@ class Light(Resource):
 
         if args['colour'] is not None:
             colour = args['colour']
-        
+
         if args['brightness'] is not None:
             try:
                 brightness = float(args['brightness'])
@@ -88,6 +66,6 @@ class Light(Resource):
                 #Brightness of 0 will turn the strip off, as will colour 'off'
                 return f"Brightness value {args['brightness']} not allowed; provide a value from 0.00 to 1.00", 400
 
-        Light.changeLight(colour, brightness)       
-        
+        Light.changeLight(colour, brightness)
+
         return f"Colour: {colour} | Brightness: {brightness}", 200
